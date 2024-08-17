@@ -1,10 +1,13 @@
 import 'dart:ui'; // Import for blur effect
 
+import 'package:finalproject/app/storage/shared_preferences.dart';
+import 'package:finalproject/core/widgets/custom_dialogue.dart';
 import 'package:finalproject/features/auth/presentation/view/login_view.dart';
 import 'package:finalproject/features/home/data/model/shake_detector.dart';
 import 'package:finalproject/features/home/presentation/navigator/home_navigator.dart';
 import 'package:finalproject/features/practice/presentation/view/practice_view.dart';
 import 'package:finalproject/features/pricing/presentation/view/pricing_view.dart';
+import 'package:finalproject/features/profile/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vibration/vibration.dart';
@@ -24,7 +27,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     HomePageContent(),
     PricingView(),
     PracticeTaskView(),
-    Text('Settings Page Content'),
+    ProfileView(),
   ];
 
   @override
@@ -41,20 +44,17 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 
   void _handleLogout() {
-    if (Vibration.hasVibrator() != null) {
-      Vibration.vibrate();
-    }
+    Vibration.vibrate();
     // Perform your logout logic here.
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Logout'),
-          content:
-              const Text('You are going to logout due to shaking the device.'),
+          content: const Text('You are going to logout due to shaking the device.'),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
                 // Navigate to the LoginScreen and remove all previous routes
@@ -65,7 +65,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
               },
             ),
             TextButton(
-              child: Text('No'),
+              child: const Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -84,6 +84,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    bool isUserLoggedIn = SharedPref.sharedPref.getBool('isUserLoggedIn') ?? false;
+    String userName = SharedPref.sharedPref.getString('userName') ?? '';
     return SafeArea(
       child: Stack(
         children: [
@@ -91,8 +93,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             // Background image
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    'assets/images/background2.jpg'), // Replace with your background image asset
+                image: AssetImage('assets/images/background2.jpg'), // Replace with your background image asset
                 fit: BoxFit.cover,
               ),
             ),
@@ -101,38 +102,85 @@ class _HomeViewState extends ConsumerState<HomeView> {
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
             child: Container(
-              color: Colors.black
-                  .withOpacity(0.4), // Dark overlay to enhance contrast
+              color: Colors.black.withOpacity(0.4), // Dark overlay to enhance contrast
             ),
           ),
           Scaffold(
             backgroundColor: Colors.transparent, // Make Scaffold transparent
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               title: Image.asset(
                 'assets/images/logo.png',
                 height: 55,
               ),
               centerTitle: false,
-              backgroundColor: Color.fromARGB(0, 106, 106, 53),
+              backgroundColor: const Color.fromARGB(0, 106, 106, 53),
               elevation: 20.0,
               shadowColor: Colors.black,
               actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginView()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Color.fromARGB(255, 216, 140, 53),
-                  ),
-                  child: const Text(
-                    'Signup / Login',
-                  ),
-                ),
+                !isUserLoggedIn
+                    ? ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginView()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: const Color.fromARGB(255, 216, 140, 53),
+                        ),
+                        child: const Text(
+                          'Signup / Login',
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Row(
+                          children: [
+                            Text(
+                              // Display username if logged in
+                              'Welcome, $userName',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            IconButton(
+                              icon: const Icon(Icons.logout),
+                              onPressed: () {
+                                showCustomDialogue(
+                                        content: 'please login for more practice questions and subscription',
+                                        title: 'Are you sure, you want to logout?',
+                                        context: context)
+                                    .then((value) async {
+                                  if (value) {
+                                    SharedPref.sharedPref.setBool('isUserLoggedIn', false);
+                                    SharedPref.sharedPref.remove('userName');
+                                    SharedPref.sharedPref.remove('email');
+                                    context.mounted
+                                        ? Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => const HomeView()),
+                                          )
+                                        : null;
+                                    context.mounted
+                                        ? ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              backgroundColor: Color(0xFF8E7F55),
+                                              content: Text('You have been logged out successfully'),
+                                            ),
+                                          )
+                                        : null;
+                                  }
+                                });
+                              },
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
               ],
             ),
             body: Center(
@@ -153,8 +201,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   label: 'Practice',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
-                  label: 'Settings',
+                  icon: Icon(Icons.person),
+                  label: 'Profile',
                 ),
               ],
               currentIndex: _selectedIndex,
@@ -223,7 +271,7 @@ class HomePageContent extends ConsumerWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Color.fromARGB(255, 216, 140, 53),
+                    backgroundColor: const Color.fromARGB(255, 216, 140, 53),
                   ),
                   child: const Text('Get Started'),
                 ),

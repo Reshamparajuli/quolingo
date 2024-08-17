@@ -47,8 +47,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     key: const ValueKey('username'),
                     controller: _usernameController,
                     decoration: InputDecoration(
-                      prefixIcon:
-                          const Icon(Icons.mail, color: Color(0xFF8E7F55)),
+                      prefixIcon: const Icon(Icons.mail, color: Color(0xFF8E7F55)),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -71,12 +70,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     controller: _passwordController,
                     obscureText: isObscure,
                     decoration: InputDecoration(
-                      prefixIcon:
-                          const Icon(Icons.lock, color: Color(0xFF8E7F55)),
+                      prefixIcon: const Icon(Icons.lock, color: Color(0xFF8E7F55)),
                       suffixIcon: IconButton(
                         icon: Icon(
                           isObscure ? Icons.visibility : Icons.visibility_off,
-                          color: Color(0xFF8E7F55),
+                          color: const Color(0xFF8E7F55),
                         ),
                         onPressed: () {
                           setState(() {
@@ -123,9 +121,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     onPressed: () async {
-                      await ref
-                          .read(authViewModelProvider.notifier)
-                          .loginStudent(
+                      await ref.read(authViewModelProvider.notifier).loginStudent(
                             _usernameController.text,
                             _passwordController.text,
                           );
@@ -146,9 +142,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                         TextButton(
                           key: const ValueKey('registerButton'),
                           onPressed: () {
-                            ref
-                                .read(authViewModelProvider.notifier)
-                                .openRegisterView();
+                            ref.read(authViewModelProvider.notifier).openRegisterView();
                           },
                           child: const Text(
                             'Signup here.',

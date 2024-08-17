@@ -133,9 +133,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          isConfirmObscure
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                          isConfirmObscure ? Icons.visibility : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
@@ -181,8 +179,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginView()),
+                              MaterialPageRoute(builder: (context) => const LoginView()),
                             );
                             // ref.read(authViewModelProvider.notifier).openLoginView();
                           },

@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:finalproject/app/constants/shared_pref_constants.dart';
+import 'package:finalproject/app/storage/shared_preferences.dart';
+import 'package:finalproject/core/models/esewa_payment.dart';
 import 'package:finalproject/features/practice/presentation/view/practice_view.dart';
 import 'package:finalproject/features/pricing/presentation/state/pricing_state.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +10,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PricingView extends ConsumerWidget {
   const PricingView({super.key});
+
+  Future<void> addCardToList(String card, int days) async {
+    List<String> cardList = SharedPref.sharedPref.getStringList(Constants.pricingCardValue) ?? [];
+    DateTime expirationDate = DateTime.now().add(Duration(days: days));
+
+    Map<String, dynamic> cardInfo = {
+      "card": card,
+      "expirationDate": expirationDate.toIso8601String(),
+    };
+    cardList.add(jsonEncode(cardInfo));
+    await SharedPref.sharedPref.setStringList(Constants.pricingCardValue, cardList);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,32 +68,30 @@ class PricingView extends ConsumerWidget {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 30),
-                    _buildPricingCard(context, 'Free Questions',
-                        Icons.question_answer, 'Get Started', onPressed: () {
+                    _buildPricingCard(context, 'Free Questions', Icons.question_answer, 'Get Started', onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const PracticeTaskView()),
+                        MaterialPageRoute(builder: (context) => const PracticeTaskView()),
                       );
                     }),
                     const SizedBox(height: 20),
-                    _buildPricingCard(
-                      context,
-                      'Unlimited Access\n7 Days',
-                      Icons.workspace_premium_outlined,
-                      'Upgrade',
-                      price: 'NPR 1099',
-                      onPressed: () => pricingNotifier.selectPlan(7),
-                    ),
+                    _buildPricingCard(context, 'Unlimited Access\n7 Days', Icons.workspace_premium_outlined, 'Upgrade',
+                        price: 'NPR 1099', onPressed: () async {
+                      await PayWithEsewa.makePayment('1099');
+                      _showSuccessDialog(context, 'Payment Successful',
+                          'You have successfully purchased Unlimited Access for 7 Days.');
+                      addCardToList('Unlimited Access 7 Days', 7);
+                    }),
                     const SizedBox(height: 20),
-                    _buildPricingCard(
-                      context,
-                      'Unlimited Access\n15 Days',
-                      Icons.workspace_premium_outlined,
-                      'Upgrade',
-                      price: 'NPR 1499',
-                      onPressed: () => pricingNotifier.selectPlan(15),
-                    ),
+                    _buildPricingCard(context, 'Unlimited Access\n15 Days', Icons.workspace_premium_outlined, 'Upgrade',
+                        price: 'NPR 1499', onPressed: () async {
+                      await PayWithEsewa.makePayment('1499');
+                      _showSuccessDialog(context, 'Payment Successful',
+                          'You have successfully purchased Unlimited Access for 15 Days.');
+                      // ignore: avoid_print
+                      print('Unlimited Access 15 Days');
+                      addCardToList('Unlimited Access 15 Days', 15);
+                    }),
                   ],
                 ),
               ),
@@ -84,6 +99,26 @@ class PricingView extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showSuccessDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -131,8 +166,7 @@ class PricingView extends ConsumerWidget {
             ElevatedButton(
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                 foregroundColor: Colors.white,
                 backgroundColor: const Color.fromARGB(255, 216, 140, 53),
                 shape: RoundedRectangleBorder(

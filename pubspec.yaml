@@ -60,6 +60,9 @@ dependencies:
   sensors_plus: ^5.0.1
   vibration: ^1.9.0
   string_similarity: ^2.1.1
+  esewa_flutter_sdk:
+    path: ./packages/esewa_flutter_sdk
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -90,6 +93,7 @@ flutter:
     - assets/images/logo.png
     - assets/images/background.jpg
     - assets/images/background2.jpg
+    - assets/gifs/
 
 
     # - images/a_dot_ham.jpeg
