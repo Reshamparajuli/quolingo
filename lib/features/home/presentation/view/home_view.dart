@@ -159,6 +159,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                     SharedPref.sharedPref.setBool('isUserLoggedIn', false);
                                     SharedPref.sharedPref.remove('userName');
                                     SharedPref.sharedPref.remove('email');
+                                    SharedPref.sharedPref.remove('pricingCardValue');
                                     context.mounted
                                         ? Navigator.push(
                                             context,

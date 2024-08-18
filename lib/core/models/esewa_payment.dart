@@ -1,4 +1,4 @@
-// ignore_for_file: constant_identifier_names
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:esewa_flutter_sdk/esewa_config.dart';
@@ -14,7 +14,9 @@ const String _SECRET_KEY = 'BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==';
 class PayWithEsewa {
   final totalPriceToShow = 0;
 
-  static makePayment(String totalAmount, BuildContext context) {
+  static Future<bool> makePayment(String totalAmount, BuildContext context) async {
+    Completer<bool> paymentCompleter = Completer<bool>();
+
     try {
       EsewaFlutterSdk.initPayment(
         esewaConfig: EsewaConfig(
@@ -29,20 +31,25 @@ class PayWithEsewa {
           callbackUrl: '',
         ),
         onPaymentSuccess: (EsewaPaymentSuccessResult data) async {
+          paymentCompleter.complete(true);
           log(':::SUCCESS::: => $data');
-          // verifyTransactionStatus(data);
           await showCustomSuccessDialogue(context: context, title: 'Payment Successful for NPR $totalAmount');
         },
         onPaymentFailure: (data) {
           log(':::FAILURE::: => $data');
+          paymentCompleter.complete(false);
         },
         onPaymentCancellation: (data) {
           log(':::CANCELLATION::: => $data');
+          paymentCompleter.complete(false);
         },
       );
     } on Exception catch (e) {
       log('EXCEPTION : ${e.toString()}');
+      paymentCompleter.complete(false);
     }
+
+    return paymentCompleter.future;
   }
 
   static void verifyTransactionStatus(EsewaPaymentSuccessResult result) async {

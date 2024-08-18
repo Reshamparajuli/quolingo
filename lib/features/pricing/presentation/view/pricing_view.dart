@@ -79,16 +79,21 @@ class PricingView extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildPricingCard(context, 'Unlimited Access\n7 Days', Icons.workspace_premium_outlined, 'Upgrade',
                         price: 'NPR 1099', onPressed: () async {
-                      if (!isUserLoggedIn) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const LoginView()),
-                        );
-                        return;
-                      }
-                      await PayWithEsewa.makePayment('1099', context);
+                      try {
+                        if (!isUserLoggedIn) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginView()),
+                          );
+                          return;
+                        } else {
+                          bool paymentSuccess = await PayWithEsewa.makePayment('1099', context);
 
-                      addCardToList('Unlimited Access 7 Days', 7);
+                          if (paymentSuccess) addCardToList('Unlimited Access 7 Days', 7);
+                        }
+                      } catch (e) {
+                        rethrow;
+                      }
                     }),
                     const SizedBox(height: 20),
                     _buildPricingCard(context, 'Unlimited Access\n15 Days', Icons.workspace_premium_outlined, 'Upgrade',
@@ -101,12 +106,12 @@ class PricingView extends ConsumerWidget {
                           );
                           return;
                         }
-                        await PayWithEsewa.makePayment('1499', context);
+                        bool paymentSuccess = await PayWithEsewa.makePayment('1499', context);
 
                         print('Unlimited Access 15 Days');
-                        addCardToList('Unlimited Access 15 Days', 15);
+                        if (paymentSuccess) addCardToList('Unlimited Access 15 Days', 15);
                       } catch (e) {
-                        print(e);
+                        rethrow;
                       }
                     }),
                   ],
