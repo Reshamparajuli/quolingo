@@ -1,3 +1,4 @@
+import 'package:finalproject/features/pricing/presentation/view/pricing_view.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -103,4 +104,15 @@ Future<bool> showCustomSuccessDialogue({
           ],
         );
       },
+    );
+
+Widget showCustomPremiumDialogue({
+  required BuildContext context,
+  String? title,
+}) =>
+    AlertDialog(
+      backgroundColor: Colors.grey.withOpacity(0.9),
+      title: const Text("You are not a premium user"),
+      content: Text(title ?? "Please upgrade to premium to access this feature"),
+      actions: const <Widget>[],
     );
