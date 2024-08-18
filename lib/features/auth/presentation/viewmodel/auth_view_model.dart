@@ -64,7 +64,7 @@ class AuthViewModel extends StateNotifier<AuthState> {
         state = state.copyWith(isLoading: false, error: null);
         SharedPref.sharedPref.setString(Constants.userName, username);
         SharedPref.sharedPref.setBool(Constants.isUserLoggedIn, true);
-        SharedPref.sharedPref.setString(Constants.userDetails, jsonEncode(AuthEntity));
+
         // SharedPref.sharedPref.setString(Constants.userEmail, authEntity.email);
         openHomeView();
       },

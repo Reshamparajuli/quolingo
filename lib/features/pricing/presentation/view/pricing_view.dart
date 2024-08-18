@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:finalproject/app/constants/shared_pref_constants.dart';
 import 'package:finalproject/app/storage/shared_preferences.dart';
 import 'package:finalproject/core/models/esewa_payment.dart';
+import 'package:finalproject/features/auth/presentation/view/login_view.dart';
 import 'package:finalproject/features/practice/presentation/view/practice_view.dart';
 import 'package:finalproject/features/pricing/presentation/state/pricing_state.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class PricingView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pricingNotifier = ref.read(pricingNotifierProvider.notifier);
+    bool isUserLoggedIn = SharedPref.sharedPref.getBool('isUserLoggedIn') ?? false;
 
     return Scaffold(
       body: Stack(
@@ -77,6 +79,13 @@ class PricingView extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildPricingCard(context, 'Unlimited Access\n7 Days', Icons.workspace_premium_outlined, 'Upgrade',
                         price: 'NPR 1099', onPressed: () async {
+                      if (!isUserLoggedIn) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoginView()),
+                        );
+                        return;
+                      }
                       await PayWithEsewa.makePayment('1099');
                       _showSuccessDialog(context, 'Payment Successful',
                           'You have successfully purchased Unlimited Access for 7 Days.');
@@ -85,6 +94,13 @@ class PricingView extends ConsumerWidget {
                     const SizedBox(height: 20),
                     _buildPricingCard(context, 'Unlimited Access\n15 Days', Icons.workspace_premium_outlined, 'Upgrade',
                         price: 'NPR 1499', onPressed: () async {
+                      if (!isUserLoggedIn) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoginView()),
+                        );
+                        return;
+                      }
                       await PayWithEsewa.makePayment('1499');
                       _showSuccessDialog(context, 'Payment Successful',
                           'You have successfully purchased Unlimited Access for 15 Days.');
