@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 Future<bool> showCustomDialogue({
   required BuildContext context,
@@ -81,3 +82,25 @@ Future<bool> showCustomDialogue({
       },
     ) ??
     false;
+
+Future<bool> showCustomSuccessDialogue({
+  required BuildContext context,
+  String? title,
+}) async =>
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Payment Successfull"),
+          content: Text(title ?? "Your payment has been successfully processed"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );

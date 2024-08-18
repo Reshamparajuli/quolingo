@@ -5,6 +5,8 @@ import 'package:esewa_flutter_sdk/esewa_config.dart';
 import 'package:esewa_flutter_sdk/esewa_flutter_sdk.dart';
 import 'package:esewa_flutter_sdk/esewa_payment.dart';
 import 'package:esewa_flutter_sdk/esewa_payment_success_result.dart';
+import 'package:finalproject/core/widgets/custom_dialogue.dart';
+import 'package:flutter/widgets.dart';
 
 const String _CLIENT_ID = 'JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R';
 const String _SECRET_KEY = 'BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==';
@@ -12,7 +14,7 @@ const String _SECRET_KEY = 'BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==';
 class PayWithEsewa {
   final totalPriceToShow = 0;
 
-  static makePayment(String totalAmount) {
+  static makePayment(String totalAmount, BuildContext context) {
     try {
       EsewaFlutterSdk.initPayment(
         esewaConfig: EsewaConfig(
@@ -26,9 +28,10 @@ class PayWithEsewa {
           productPrice: totalAmount,
           callbackUrl: '',
         ),
-        onPaymentSuccess: (EsewaPaymentSuccessResult data) {
+        onPaymentSuccess: (EsewaPaymentSuccessResult data) async {
           log(':::SUCCESS::: => $data');
-          verifyTransactionStatus(data);
+          // verifyTransactionStatus(data);
+          await showCustomSuccessDialogue(context: context, title: 'Payment Successful for NPR $totalAmount');
         },
         onPaymentFailure: (data) {
           log(':::FAILURE::: => $data');

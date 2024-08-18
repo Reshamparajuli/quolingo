@@ -86,27 +86,28 @@ class PricingView extends ConsumerWidget {
                         );
                         return;
                       }
-                      await PayWithEsewa.makePayment('1099');
-                      _showSuccessDialog(context, 'Payment Successful',
-                          'You have successfully purchased Unlimited Access for 7 Days.');
+                      await PayWithEsewa.makePayment('1099', context);
+
                       addCardToList('Unlimited Access 7 Days', 7);
                     }),
                     const SizedBox(height: 20),
                     _buildPricingCard(context, 'Unlimited Access\n15 Days', Icons.workspace_premium_outlined, 'Upgrade',
                         price: 'NPR 1499', onPressed: () async {
-                      if (!isUserLoggedIn) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const LoginView()),
-                        );
-                        return;
+                      try {
+                        if (!isUserLoggedIn) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginView()),
+                          );
+                          return;
+                        }
+                        await PayWithEsewa.makePayment('1499', context);
+
+                        print('Unlimited Access 15 Days');
+                        addCardToList('Unlimited Access 15 Days', 15);
+                      } catch (e) {
+                        print(e);
                       }
-                      await PayWithEsewa.makePayment('1499');
-                      _showSuccessDialog(context, 'Payment Successful',
-                          'You have successfully purchased Unlimited Access for 15 Days.');
-                      // ignore: avoid_print
-                      print('Unlimited Access 15 Days');
-                      addCardToList('Unlimited Access 15 Days', 15);
                     }),
                   ],
                 ),
@@ -115,26 +116,6 @@ class PricingView extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-
-  void _showSuccessDialog(BuildContext context, String title, String content) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
